@@ -40,3 +40,66 @@ void dijkstra(int N, int *hasil_gabung, int *graph)
     }
 }
 
+
+int main(void)
+{
+  int N = 100;
+  int *hasil_gabung;
+  int *graph;
+
+  cudaMallocManaged(&hasil_gabung, N*N*sizeof(int));  
+  cudaMallocManaged(&graph, N*N*sizeof(int));
+
+  srand(13517093);
+  for(int i = 0;i<N;i++) {
+      graph[i*N+i] = 0;
+      for(int j = i+1;j<N;j++) {
+          graph[i*N+j] = rand() % 23;
+          if(graph[i*N+j] == 0) graph[i*N+j] = 1;
+          graph[j*N+i] = graph[i*N+j];
+      }
+  }
+  struct timeval start, end;
+  // gettimeofday(&start, NULL);
+  
+  int blockSize = 256;  
+  int numBlocks = (N + blockSize - 1) / blockSize;
+
+  clock_t tStart = clock();
+  dijkstra<<<numBlocks , blockSize>>>(N, hasil_gabung, graph);
+
+  cudaDeviceSynchronize();
+
+  //for (int i = 0;i < N;i++) {
+    // for (int j = 0;j < N; j++) {
+      // cout << graph[i*N+j];
+       // if(j != N-1) {
+         // cout << " ";
+      // }
+     //}
+     //cout << endl;
+  // }
+
+  cout << "------DIJKSTRA-------" << endl;
+
+   for (int i = 0;i < N;i++) {
+     for (int j = 0;j < N; j++) {
+       cout << hasil_gabung[i*N+j];
+         if(j != N-1) {
+            cout << " ";
+          }
+     }
+     cout << endl;
+  }
+  // gettimeofday(&end, NULL);
+
+  // double delta = ((end.tv_sec  - start.tv_sec) * 1000000u + end.tv_usec - start.tv_usec) / 1.e6;
+  // printf("Time execution : %lf", delta);
+  printf("Time taken: %.2f microsekon\n", (double)(clock() - tStart)/CLOCKS_PER_SEC*1000000 );
+  // https://www.geeksforgeeks.org/clock-function-in-c-c/
+  // Free memory
+  cudaFree(hasil_gabung);
+  cudaFree(graph);
+  
+  return 0;
+}
