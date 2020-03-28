@@ -41,9 +41,9 @@ void dijkstra(int N, int *hasil_gabung, int *graph)
 }
 
 
-int main(void)
+int main(int argc, char** argv)
 {
-  int N = 100;
+  int N = stoi(argv[1]);
   int *hasil_gabung;
   int *graph;
 
@@ -62,7 +62,7 @@ int main(void)
   struct timeval start, end;
   // gettimeofday(&start, NULL);
   
-  int blockSize = 256;  
+  int blockSize = stoi(argv[2]);  
   int numBlocks = (N + blockSize - 1) / blockSize;
 
   clock_t tStart = clock();
