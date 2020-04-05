@@ -24,7 +24,9 @@ Setiap proses akan mengirimkan hasil perhitungan dijkstra pada lokal nodenya lal
 Dijkstra dilakukan sebanyak n kali sesuai dengan jumlah node. Dengan mempararelkan proses dijkstra menurut kami akan menghasilkan solusi yang lebih baik.
 
 ## Jumlah Thread
-Jumlah thread yang optimal adalah sebanyak jumlah maksimal thread dalam satu block. Dalam kasus server, jumlah maksimum thread per block sebanyak 1024 sesuai dengan spesifikasi GPU, sehingga kami memilih menggunakan 1024 sebagai jumlah threadnya. Adapun untuk kasus 100 node ternyata hasil paralel lebih lambat dibanding dengan serial, menurut analisis kami, hal ini dapat terjadi karena jumlah thread yang kami gunakan sebanyak 1024 padahal pada kenyatannya hanya dibutuhkan 100 thread untuk melakukan perhitungan dijkstra sehingga sebahanyak (1024 - 100 = 924 proses) menjadi sia-sia dan memperlambat kinerja keseluruhan proses.
+Jumlah thread yang optimal adalah sebanyak jumlah maksimal thread dalam satu block. Dalam kasus server, jumlah maksimum thread per block sebanyak 1024 sesuai dengan spesifikasi GPU, sehingga kami memilih menggunakan 1024 sebagai jumlah threadnya.
+
+Namun, setelah dilakukan eksperimen, dengan berbagai angka yang berbeda ternyata hasil yang paling maksimal adalah dengan menggunakan **32 thread per block**. Menurut kami, hal ini dapat terjadi karena dengan thread > 32 bahkan hingga maksimal (1024 thread) akan menimbulkan **overhead** yang besar dan memperlambat waktu eksekusi program.
 
 ## Pengukuran kinerja
 | Banyak Node | Paralel | Serial |
@@ -35,5 +37,7 @@ Jumlah thread yang optimal adalah sebanyak jumlah maksimal thread dalam satu blo
 | 3000        | 28249127, 34421236, 33592223 | 239282393, 245265219, 249323108 |
 
 ## Analisis kinerja
-Kinerja pada proses parallel berjalan lebih cepat dari serial untuk hampir semua kasus. Dari 18 percobaan yang kami lakukan, semua proses parallel berjalan lebih cepat dari proses serial, kecuali pada kasus 100 node. Hal ini seperti penjelasan sebelumya, terjadi karena kami memilih menggunakan 1024 sebagai jumlah threadnya, sehingga sebanyak (1024 - 100 = 924 proses) menjadi sia-sia dan memperlambat kinerja keseluruhan proses untuk pengujian tersebut.
+Kinerja pada proses parallel berjalan lebih cepat dari serial untuk hampir semua kasus. Dari 18 percobaan yang kami lakukan, semua proses parallel berjalan lebih cepat dari proses serial, kecuali pada kasus 100 node. Hal ini seperti penjelasan sebelumya, terjadi karena kami memilih menggunakan 32 sebagai jumlah threadnya, sehingga sebanyak (32 mod (- 100) = 28 proses) menjadi sia-sia dan memperlambat kinerja keseluruhan proses untuk pengujian tersebut. 28 jika dibandingkan dengan 100 menjadi angka yang cukup signifikan. 
+
+Selain jumlah thread per block, kecepatan eksekusi program juga bergantung kepada keadaan server. Sebagai perbandingan, saat eksperimen dilakukan di siang hari dibandingkan dengan di malam hari, menghasilkan waktu eksekusi yang jauh berbeda. Pada saat malam hari waktu eksekusi bisa mencapai 2 kali lipat lebih cepat dibanding siang hari. Kami menduga saat server penuh, mengakibatkan program menunggu thread yang kosong sehingga memperlambat waktu eksekusi.
 
