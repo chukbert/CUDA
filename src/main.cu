@@ -12,8 +12,8 @@ void dijkstra(int N, int *hasil_gabung, int *graph)
   int stride = blockDim.x * gridDim.x;
   for (int src = index; src < N; src += stride){
     const int N_const = N;
-    int dist[106]; // Ganti ini juga sesuai dengan nilai N 
-    int sptSet[106]; // Ganti ini juga sesuai dengan nilai N
+    int dist[110]; // Ganti ini juga sesuai dengan nilai N 
+    int sptSet[110]; // Ganti ini juga sesuai dengan nilai N
 
     for (int i = 0; i < N; i++) 
       dist[i] = INT_MAX, sptSet[i] = 0; 
